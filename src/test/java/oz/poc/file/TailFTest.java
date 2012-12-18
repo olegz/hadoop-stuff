@@ -1,10 +1,12 @@
 package oz.poc.file;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -24,6 +26,24 @@ import org.springframework.util.Assert;
 public class TailFTest {
 	
 	/**
+	 * 0. RUN THIS BEFORE ANYTHING
+	 * @throws Exception
+	 */
+	@Test
+	public void prepSourceFile() throws Exception {
+		
+		BufferedWriter bw = new BufferedWriter(new FileWriter("source/source.txt"));
+		for (int i = 0; i < 125; i++) {
+			BufferedReader br = new BufferedReader(new FileReader("source/small-source.txt"));
+			for (int j = 0; j < 80000; j++) {
+				bw.write(br.readLine() + "\n");		
+			}
+			br.close();
+		}
+		bw.close();
+	}
+	
+	/**
 	 * 1.
 	 * Will establish the benchmark of how long does it take to write a 10M rec (~230 bytes each)
 	 * to HDFS. No compression or other optimizations
@@ -37,7 +57,7 @@ public class TailFTest {
 		Path outFilePath = new Path("/hduser/input/compressed.txt");
 		OutputStream outFile = fs.create(outFilePath);
 
-		final BufferedReader br = new BufferedReader(new FileReader("source/source.txt"));
+		BufferedReader br = new BufferedReader(new FileReader("source/source.txt"));
 		long start = System.currentTimeMillis();
 		System.out.println("Starting");
 		for (int i = 0; i < 10000000; i++) {
