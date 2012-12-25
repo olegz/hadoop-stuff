@@ -34,7 +34,7 @@ task wrapper(type: Wrapper) {
 
 task seqCompressed(dependsOn: 'classes', type: JavaExec) {
   description = 'Blah blah'
-  args project.property('setup')
+  //args project.property('setup')
   main = 'oz.poc.main.CompressedSequenceFile'
   classpath = sourceSets.main.runtimeClasspath
 }
