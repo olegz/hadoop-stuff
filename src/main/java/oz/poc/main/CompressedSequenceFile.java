@@ -23,8 +23,6 @@ import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import oz.poc.file.ImmutableBytesWritableMine;
-
 public class CompressedSequenceFile {
 
 	/**
