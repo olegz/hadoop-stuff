@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.net.InetAddress;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -29,6 +30,8 @@ public class CompressedSequenceFile {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception{
+		final InetAddress localHost = InetAddress.getLocalHost();
+		System.out.println(localHost.getHostAddress());
 		System.out.println("######## Starting task #########");
 		System.out.println("Arguments: " + Arrays.asList(args) + " " + args.length);
 		String arguments = Arrays.asList(args).get(0);
@@ -57,6 +60,7 @@ public class CompressedSequenceFile {
 			
 			ExecutorService executor = Executors.newFixedThreadPool(virtualWriters);
 			final CountDownLatch latch = new CountDownLatch(virtualWriters);
+			long start = System.currentTimeMillis();
 			for (int i = 0; i < virtualWriters; i++) {
 				final int I = i;
 				executor.execute(new Runnable() {
@@ -64,7 +68,7 @@ public class CompressedSequenceFile {
 					@Override
 					public void run() {
 						try {
-							testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile+"-" + I, sourcePath, threadPool, blockCompression);
+							testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, localHost.getHostAddress() + "-" + pathToHdfsFile+"-" + I, sourcePath, threadPool, blockCompression);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -74,7 +78,9 @@ public class CompressedSequenceFile {
 			}
 			
 			latch.await();
-			System.out.println("Done writing with " + virtualWriters + " virtual writers");
+			long stop = System.currentTimeMillis();
+			long totalRecords = sourceRecordCount * virtualWriters;
+			System.out.println("Done writing " + totalRecords + " with " + virtualWriters + " virtual writers in " + (stop-start) + " milliseconds");
 			executor.shutdownNow();
 			
 		}	
