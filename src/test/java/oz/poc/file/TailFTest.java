@@ -139,21 +139,14 @@ public class TailFTest {
 		
 		final ExecutorService executor = Executors.newFixedThreadPool(8);
 
-		//final FileOutputStream fos = new FileOutputStream(new File("source/compressed.txt"));
 		Configuration configuration = new Configuration();
 		configuration.set("dfs.block.size", "536870912");// play around with this number (in bytes)
 		FileSystem fs = FileSystem.get(new URI("hdfs://192.168.15.20:54310"), configuration, "hduser");
-		Path outFilePath1 = new Path("/hduser/input/compressed1.seq");
-		//Path outFilePath2 = new Path("/hduser/input/compressed2.seq");
-		Path outFilePath3 = new Path("/hduser/input/compressed3.seq");
-		//final OutputStream fos = fs.create(outFilePath);
-		final SequenceFile.Writer writer1 = SequenceFile.createWriter(fs, configuration, outFilePath1, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
+		Path outFilePath = new Path("/hduser/input/compressed.seq");
+		
+		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
 		
 		final IntWritable key = new IntWritable();
-		
-        //final SequenceFile.Writer writer2 = SequenceFile.createWriter(fs, configuration, outFilePath2, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
-		
-        final SequenceFile.Writer writer3 = SequenceFile.createWriter(fs, configuration, outFilePath3, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
 		
 		final BufferedReader br = new BufferedReader(new FileReader("source/source.txt"));
 		
@@ -167,14 +160,7 @@ public class TailFTest {
 					try {
 						//System.out.println("Writing: " + i);
 						final ImmutableBytesWritable compressedBytes = recordQueue.poll(1000, TimeUnit.MILLISECONDS);
-						if (swap){	
-							writer1.append(key, compressedBytes);
-							swap = false;
-						}
-						else {
-							writer3.append(key, compressedBytes);
-							swap = true;
-						}
+						writer.append(key, compressedBytes);
 						
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -217,9 +203,7 @@ public class TailFTest {
 		latch.await();
 		long stop = System.currentTimeMillis();
 		System.out.println("Compressed and written " + sourceRecords + " records in " + (stop - start) + " milliseconds");
-		writer1.close();
-		//writer2.close();
-		writer3.close();
+		writer.close();
 		br.close();
 	}
 	
