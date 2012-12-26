@@ -155,7 +155,6 @@ public class TailFTest {
 			
 			@Override
 			public void run() {
-				boolean swap = true;
 				for (int i = 0; i < outerLoop; i++) {
 					try {
 						//System.out.println("Writing: " + i);
