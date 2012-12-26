@@ -86,7 +86,7 @@ public class CompressedSequenceFile {
 		FileSystem fs = FileSystem.get(new URI(uri), configuration, user);
 		Path outFilePath = new Path(pathToHdfsFile);
 		
-		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritableMine.class, CompressionType.BLOCK);
+		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
 		
 		final IntWritable key = new IntWritable();
 		
