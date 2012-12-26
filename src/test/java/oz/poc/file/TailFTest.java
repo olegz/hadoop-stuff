@@ -62,13 +62,13 @@ public class TailFTest {
 		IntWritable key = new IntWritable();
 		
 		SequenceFile.Writer writer = null;
-		ImmutableBytesWritable value = new ImmutableBytesWritable();
+		ImmutableBytesWritableMine value = new ImmutableBytesWritableMine();
 		
 		
 		BufferedReader br = new BufferedReader(new FileReader("source/source.txt"));
 		
 		try {
-			writer = SequenceFile.createWriter(fs, configuration, outFilePath, key.getClass(), ImmutableBytesWritable.class, CompressionType.NONE);
+			writer = SequenceFile.createWriter(fs, configuration, outFilePath, key.getClass(), ImmutableBytesWritableMine.class, CompressionType.NONE);
 			long start = System.currentTimeMillis();
 			System.out.println("Starting");
 			for (int i = 0; i < 10; i++) {
@@ -97,7 +97,7 @@ public class TailFTest {
 		IntWritable key = new IntWritable();
 		
 		SequenceFile.Writer writer = null;
-		ImmutableBytesWritable value = new ImmutableBytesWritable();
+		ImmutableBytesWritableMine value = new ImmutableBytesWritableMine();
 		
 		Field field = ReflectionUtils.findField(BytesWritable.class, "bytes");
 		field.setAccessible(true);
@@ -105,7 +105,7 @@ public class TailFTest {
 		BufferedReader br = new BufferedReader(new FileReader("source/source.txt"));
 		
 		try {
-			writer = SequenceFile.createWriter(fs, configuration, outFilePath, key.getClass(), ImmutableBytesWritable.class, CompressionType.NONE);
+			writer = SequenceFile.createWriter(fs, configuration, outFilePath, key.getClass(), ImmutableBytesWritableMine.class, CompressionType.NONE);
 			long start = System.currentTimeMillis();
 			System.out.println("Starting");
 			for (int i = 0; i < 10000; i++) {
@@ -144,13 +144,13 @@ public class TailFTest {
 		FileSystem fs = FileSystem.get(new URI("hdfs://192.168.15.20:54310"), configuration, "hduser");
 		Path outFilePath = new Path("/hduser/input/compressed.seq");
 		
-		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
+		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritableMine.class, CompressionType.BLOCK);
 		
 		final IntWritable key = new IntWritable();
 		
 		final BufferedReader br = new BufferedReader(new FileReader("source/source.txt"));
 		
-		final ArrayBlockingQueue<ImmutableBytesWritable> recordQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(outerLoop);
+		final ArrayBlockingQueue<ImmutableBytesWritableMine> recordQueue = new ArrayBlockingQueue<ImmutableBytesWritableMine>(outerLoop);
 		executor.execute(new Runnable() {
 			
 			@Override
@@ -158,7 +158,7 @@ public class TailFTest {
 				for (int i = 0; i < outerLoop; i++) {
 					try {
 						//System.out.println("Writing: " + i);
-						final ImmutableBytesWritable compressedBytes = recordQueue.poll(1000, TimeUnit.MILLISECONDS);
+						final ImmutableBytesWritableMine compressedBytes = recordQueue.poll(1000, TimeUnit.MILLISECONDS);
 						writer.append(key, compressedBytes);
 						
 					} catch (Exception e) {
@@ -190,7 +190,7 @@ public class TailFTest {
 				public void run() {
 					try {
 						byte[] compressedBytes = compressBOS(bytesToCompress);
-						recordQueue.offer(new ImmutableBytesWritable(compressedBytes));
+						recordQueue.offer(new ImmutableBytesWritableMine(compressedBytes));
 					} catch (Exception e) {
 						e.printStackTrace();
 					} 
