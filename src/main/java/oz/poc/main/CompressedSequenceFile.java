@@ -52,7 +52,9 @@ public class CompressedSequenceFile {
 			String sourcePath = argumentsParsed[8];
 			int threadPool = Integer.parseInt(argumentsParsed[9]);
 			
-			testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile, sourcePath, threadPool);
+			boolean blockCompression = Boolean.getBoolean(argumentsParsed[10]);
+			
+			testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile, sourcePath, threadPool, blockCompression);
 		}
 		
 		
@@ -71,7 +73,7 @@ public class CompressedSequenceFile {
 		bw.close();
 	}
 	
-	public void toHDFS(int sourceRecordCount, int bufferSize, int blockSize, String uri, String user, String pathToHdfsFile, String sourcePath, int threadPool) throws Exception {
+	public void toHDFS(int sourceRecordCount, int bufferSize, int blockSize, String uri, String user, String pathToHdfsFile, String sourcePath, int threadPool, boolean blockCompression) throws Exception {
 
 		Assert.isTrue(sourceRecordCount % bufferSize == 0); // make sure its divisible without the remainder
 		final int outerLoop = sourceRecordCount / bufferSize;
@@ -83,8 +85,11 @@ public class CompressedSequenceFile {
 		configuration.set("dfs.block.size", blockSize+"");// play around with this number (in bytes)
 		FileSystem fs = FileSystem.get(new URI(uri), configuration, user);
 		Path outFilePath = new Path(pathToHdfsFile);
-		
-		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
+		SequenceFile.CompressionType compType = CompressionType.NONE;
+		if (blockCompression){
+			compType = CompressionType.BLOCK;
+		}
+		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritable.class, compType);
 		
 		final IntWritable key = new IntWritable();
 		
@@ -140,6 +145,7 @@ public class CompressedSequenceFile {
 		System.out.println("Compressed and written " + sourceRecordCount + " records in " + (stop - start) + " milliseconds");
 		writer.close();
 		br.close();
+		executor.shutdownNow();
 	}
 	
 	private byte[] compressBOS(byte[] inputData) throws Exception {
