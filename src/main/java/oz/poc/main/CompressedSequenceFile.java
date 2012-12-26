@@ -43,14 +43,14 @@ public class CompressedSequenceFile {
 			testHarness.prepareFile(value, path);
 		}
 		else if (methodName.equalsIgnoreCase("toHDFS")){
-			int sourceRecordCount = Integer.parseInt(argumentsParsed[1]);
-			int bufferSize = Integer.parseInt(argumentsParsed[2]);
-			int blockSize = Integer.parseInt(argumentsParsed[3]);
-			String uri = argumentsParsed[4];
-			String user = argumentsParsed[5];
-			String pathToHdfsFile = argumentsParsed[6];
-			String sourcePath = argumentsParsed[7];
-			int threadPool = Integer.parseInt(argumentsParsed[8]);
+			int sourceRecordCount = Integer.parseInt(argumentsParsed[2]);
+			int bufferSize = Integer.parseInt(argumentsParsed[3]);
+			int blockSize = Integer.parseInt(argumentsParsed[4]);
+			String uri = argumentsParsed[5];
+			String user = argumentsParsed[6];
+			String pathToHdfsFile = argumentsParsed[7];
+			String sourcePath = argumentsParsed[8];
+			int threadPool = Integer.parseInt(argumentsParsed[9]);
 			
 			testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile, sourcePath, threadPool);
 		}
