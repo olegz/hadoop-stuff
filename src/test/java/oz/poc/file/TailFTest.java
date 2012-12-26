@@ -16,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -136,17 +137,24 @@ public class TailFTest {
 		final int outerLoop = sourceRecords / bufferSize;
 		final CountDownLatch latch = new CountDownLatch(outerLoop);
 		
-		ExecutorService executor = Executors.newFixedThreadPool(8);
+		final ExecutorService executor = Executors.newFixedThreadPool(8);
 
 		//final FileOutputStream fos = new FileOutputStream(new File("source/compressed.txt"));
 		Configuration configuration = new Configuration();
-		configuration.set("dfs.block.size", "134217728");// play around with this number (in bytes)
-		FileSystem fs = FileSystem.get(new URI("hdfs://192.168.47.10:54310"), configuration, "hduser");
-		Path outFilePath = new Path("/hduser/input/compressed.seq");
+		configuration.set("dfs.block.size", "536870912");// play around with this number (in bytes)
+		FileSystem fs = FileSystem.get(new URI("hdfs://192.168.15.20:54310"), configuration, "hduser");
+		Path outFilePath1 = new Path("/hduser/input/compressed1.seq");
+		//Path outFilePath2 = new Path("/hduser/input/compressed2.seq");
+		Path outFilePath3 = new Path("/hduser/input/compressed3.seq");
 		//final OutputStream fos = fs.create(outFilePath);
-		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
+		final SequenceFile.Writer writer1 = SequenceFile.createWriter(fs, configuration, outFilePath1, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
 		
 		final IntWritable key = new IntWritable();
+		
+        //final SequenceFile.Writer writer2 = SequenceFile.createWriter(fs, configuration, outFilePath2, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
+		
+        final SequenceFile.Writer writer3 = SequenceFile.createWriter(fs, configuration, outFilePath3, IntWritable.class, ImmutableBytesWritable.class, CompressionType.BLOCK);
+		
 		final BufferedReader br = new BufferedReader(new FileReader("source/source.txt"));
 		
 		final ArrayBlockingQueue<ImmutableBytesWritable> recordQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(outerLoop);
@@ -154,15 +162,24 @@ public class TailFTest {
 			
 			@Override
 			public void run() {
+				boolean swap = true;
 				for (int i = 0; i < outerLoop; i++) {
 					try {
-						ImmutableBytesWritable compressedBytes = recordQueue.poll(1000, TimeUnit.MILLISECONDS);
-						writer.append(key, compressedBytes);
+						//System.out.println("Writing: " + i);
+						final ImmutableBytesWritable compressedBytes = recordQueue.poll(1000, TimeUnit.MILLISECONDS);
+						if (swap){	
+							writer1.append(key, compressedBytes);
+							swap = false;
+						}
+						else {
+							writer3.append(key, compressedBytes);
+							swap = true;
+						}
+						
 					} catch (Exception e) {
 						e.printStackTrace();
-					} finally {
-						latch.countDown();
-					}
+					} 
+					latch.countDown();
 				}
 			}
 		});
@@ -200,7 +217,9 @@ public class TailFTest {
 		latch.await();
 		long stop = System.currentTimeMillis();
 		System.out.println("Compressed and written " + sourceRecords + " records in " + (stop - start) + " milliseconds");
-		writer.close();
+		writer1.close();
+		//writer2.close();
+		writer3.close();
 		br.close();
 	}
 	
@@ -323,7 +342,7 @@ public class TailFTest {
 		//final FileOutputStream fos = new FileOutputStream(new File("source/compressed.txt"));
 		Configuration configuration = new Configuration();
 		configuration.set("dfs.block.size", "134217728");// play around with this number (in bytes)
-		FileSystem fs = FileSystem.get(new URI("hdfs://192.168.47.10:54310"), configuration, "hduser");
+		FileSystem fs = FileSystem.get(new URI("hdfs://192.168.15.20:54310"), configuration, "hduser");
 		Path outFilePath = new Path("/hduser/input/compressed.txt");
 		final OutputStream fos = fs.create(outFilePath);
 		
