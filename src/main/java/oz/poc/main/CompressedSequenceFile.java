@@ -42,7 +42,7 @@ public class CompressedSequenceFile {
 			String path = argumentsParsed[2];
 			testHarness.prepareFile(value, path);
 		}
-		else if (methodName.equalsIgnoreCase("prepareFile")){
+		else if (methodName.equalsIgnoreCase("toHDFS")){
 			int sourceRecordCount = Integer.parseInt(argumentsParsed[1]);
 			int bufferSize = Integer.parseInt(argumentsParsed[2]);
 			int blockSize = Integer.parseInt(argumentsParsed[3]);
