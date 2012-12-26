@@ -20,7 +20,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
-import org.junit.Test;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -74,7 +73,6 @@ public class CompressedSequenceFile {
 		bw.close();
 	}
 	
-	@Test
 	public void toHDFS(int sourceRecordCount, int bufferSize, int blockSize, String uri, String user, String pathToHdfsFile, String sourcePath, int threadPool) throws Exception {
 
 		Assert.isTrue(sourceRecordCount % bufferSize == 0); // make sure its divisible without the remainder
