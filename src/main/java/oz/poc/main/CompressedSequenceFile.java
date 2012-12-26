@@ -68,7 +68,7 @@ public class CompressedSequenceFile {
 					@Override
 					public void run() {
 						try {
-							testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, localHost.getHostAddress() + "-" + pathToHdfsFile+"-" + I, sourcePath, threadPool, blockCompression);
+							testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile+"-" + localHost.getHostAddress() + "-" + I + ".seq", sourcePath, threadPool, blockCompression);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -99,7 +99,7 @@ public class CompressedSequenceFile {
 		bw.close();
 	}
 	
-	public void toHDFS(int sourceRecordCount, int bufferSize, int blockSize, String uri, String user, String pathToHdfsFile, String sourcePath, int threadPool, boolean blockCompression) throws Exception {
+	public void toHDFS(int sourceRecordCount, final int bufferSize, int blockSize, String uri, String user, String pathToHdfsFile, String sourcePath, int threadPool, boolean blockCompression) throws Exception {
 
 		Assert.isTrue(sourceRecordCount % bufferSize == 0); // make sure its divisible without the remainder
 		final int outerLoop = sourceRecordCount / bufferSize;
@@ -133,6 +133,9 @@ public class CompressedSequenceFile {
 							throw new IllegalStateException("Timed out while retrieving data from queue");
 						}
 						writer.append(key, compressedBytes);
+						if (i%10000 == 0){
+							System.out.println("Written " + (i*bufferSize) + " records");
+						}
 						
 					} catch (Exception e) {
 						e.printStackTrace();
