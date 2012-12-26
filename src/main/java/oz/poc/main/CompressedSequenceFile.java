@@ -100,7 +100,7 @@ public class CompressedSequenceFile {
 	}
 	
 	public void toHDFS(int sourceRecordCount, final int bufferSize, int blockSize, String uri, String user, String pathToHdfsFile, String sourcePath, int threadPool, boolean blockCompression) throws Exception {
-
+		final InetAddress localHost = InetAddress.getLocalHost();
 		Assert.isTrue(sourceRecordCount % bufferSize == 0); // make sure its divisible without the remainder
 		final int outerLoop = sourceRecordCount / bufferSize;
 		final CountDownLatch latch = new CountDownLatch(outerLoop);
@@ -126,6 +126,7 @@ public class CompressedSequenceFile {
 			
 			@Override
 			public void run() {
+				long startTime = System.currentTimeMillis();
 				for (int i = 0; i < outerLoop; i++) {
 					try {
 						final ImmutableBytesWritable compressedBytes = recordQueue.poll(10000, TimeUnit.MILLISECONDS);
@@ -134,7 +135,9 @@ public class CompressedSequenceFile {
 						}
 						writer.append(key, compressedBytes);
 						if (i%10000 == 0){
-							System.out.println("Written " + (i*bufferSize) + " records");
+							long stopTime = System.currentTimeMillis();
+							System.out.println(localHost + " - Written " + (i*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
+							startTime = System.currentTimeMillis();
 						}
 						
 					} catch (Exception e) {
