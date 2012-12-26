@@ -58,12 +58,13 @@ public class CompressedSequenceFile {
 			ExecutorService executor = Executors.newFixedThreadPool(virtualWriters);
 			final CountDownLatch latch = new CountDownLatch(virtualWriters);
 			for (int i = 0; i < virtualWriters; i++) {
+				final int I = i;
 				executor.execute(new Runnable() {
 					
 					@Override
 					public void run() {
 						try {
-							testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile, sourcePath, threadPool, blockCompression);
+							testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile+"-" + I, sourcePath, threadPool, blockCompression);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
