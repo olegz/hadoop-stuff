@@ -24,15 +24,16 @@ public class CompressedSequenceFile {
 		CompressedSequenceFile testHarness = new CompressedSequenceFile();
 		if (methodName.equalsIgnoreCase("prepareFile")){
 			int value = Integer.parseInt(argumentsParsed[1]);
-			testHarness.prepareFile(value);
+			String path = argumentsParsed[2];
+			testHarness.prepareFile(value, path);
 		}
 		
 		
 		
 	}
 	
-	public void prepareFile(int value) throws Exception{
-		BufferedWriter bw = new BufferedWriter(new FileWriter("source/source.txt"));
+	public void prepareFile(int value, String path) throws Exception{
+		BufferedWriter bw = new BufferedWriter(new FileWriter(path));
 		for (int i = 0; i < value; i++) {
 			BufferedReader br = new BufferedReader(new FileReader("source/small-source.txt"));
 			for (int j = 0; j < 80000; j++) {
