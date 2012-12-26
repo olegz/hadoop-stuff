@@ -36,28 +36,47 @@ public class CompressedSequenceFile {
 		
 		String methodName = argumentsParsed[0];
 		
-		CompressedSequenceFile testHarness = new CompressedSequenceFile();
+		final CompressedSequenceFile testHarness = new CompressedSequenceFile();
 		if (methodName.equalsIgnoreCase("prepareFile")){
 			int value = Integer.parseInt(argumentsParsed[1]);
 			String path = argumentsParsed[2];
 			testHarness.prepareFile(value, path);
 		}
 		else if (methodName.equalsIgnoreCase("toHDFS")){
-			int sourceRecordCount = Integer.parseInt(argumentsParsed[2]);
-			int bufferSize = Integer.parseInt(argumentsParsed[3]);
-			int blockSize = Integer.parseInt(argumentsParsed[4]);
-			String uri = argumentsParsed[5];
-			String user = argumentsParsed[6];
-			String pathToHdfsFile = argumentsParsed[7];
-			String sourcePath = argumentsParsed[8];
-			int threadPool = Integer.parseInt(argumentsParsed[9]);
+			final int virtualWriters = Integer.parseInt(argumentsParsed[1]);
+			final int sourceRecordCount = Integer.parseInt(argumentsParsed[2]);
+			final int bufferSize = Integer.parseInt(argumentsParsed[3]);
+			final int blockSize = Integer.parseInt(argumentsParsed[4]);
+			final String uri = argumentsParsed[5];
+			final String user = argumentsParsed[6];
+			final String pathToHdfsFile = argumentsParsed[7];
+			final String sourcePath = argumentsParsed[8];
+			final int threadPool = Integer.parseInt(argumentsParsed[9]);
 			
-			boolean blockCompression = Boolean.getBoolean(argumentsParsed[10]);
+			final boolean blockCompression = Boolean.getBoolean(argumentsParsed[10]);
 			
-			testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile, sourcePath, threadPool, blockCompression);
-		}
-		
-		
+			ExecutorService executor = Executors.newFixedThreadPool(virtualWriters);
+			final CountDownLatch latch = new CountDownLatch(virtualWriters);
+			for (int i = 0; i < virtualWriters; i++) {
+				executor.execute(new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							testHarness.toHDFS(sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile, sourcePath, threadPool, blockCompression);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						latch.countDown();
+					}
+				});
+			}
+			
+			latch.await();
+			System.out.println("Done writing with " + virtualWriters + " virtual writers");
+			executor.shutdownNow();
+			
+		}	
 	}
 	
 	public void prepareFile(int value, String path) throws Exception{
@@ -102,7 +121,10 @@ public class CompressedSequenceFile {
 			public void run() {
 				for (int i = 0; i < outerLoop; i++) {
 					try {
-						final ImmutableBytesWritable compressedBytes = recordQueue.poll(1000, TimeUnit.MILLISECONDS);
+						final ImmutableBytesWritable compressedBytes = recordQueue.poll(10000, TimeUnit.MILLISECONDS);
+						if (compressedBytes == null){
+							throw new IllegalStateException("Timed out while retrieving data from queue");
+						}
 						writer.append(key, compressedBytes);
 						
 					} catch (Exception e) {
