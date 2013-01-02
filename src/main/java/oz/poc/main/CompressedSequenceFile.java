@@ -149,7 +149,12 @@ public class CompressedSequenceFile {
 					} catch (Exception e) {
 						e.printStackTrace();
 					} 
+					long g = latch.getCount();
+					
 					latch.countDown();
+					if (g == 1){
+						System.out.println("Latch should be 0: " + latch.getCount());
+					}
 				}
 			}
 		});
@@ -187,7 +192,7 @@ public class CompressedSequenceFile {
 			}
 			br.close();
 		}
-		
+		System.out.println("Wating on latch");
 		latch.await();
 		long stop = System.currentTimeMillis();
 		System.out.println("Compressed and written " + (sourceRecordCount*loopCount) + " records in " + (stop - start) + " milliseconds");
