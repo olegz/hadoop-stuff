@@ -159,7 +159,7 @@ public class CompressedSequenceFile {
 			for (int i = 0; i < oLoop; i++) {
 				StringBuffer buffer = new StringBuffer(bufferSize * 230);
 				for (int j = 0; j < bufferSize; j++) {
-					if (j%100 == 0){
+					if (j%200 == 0){
 						Thread.sleep(random.nextInt(1));
 					}
 					String line = br.readLine();
