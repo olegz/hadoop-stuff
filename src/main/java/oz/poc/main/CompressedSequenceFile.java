@@ -108,6 +108,8 @@ public class CompressedSequenceFile {
 		Assert.isTrue(sourceRecordCount % bufferSize == 0); // make sure its divisible without the remainder
 		final int outerLoop = (sourceRecordCount*loopCount) / bufferSize;
 		final CountDownLatch latch = new CountDownLatch(outerLoop);
+		System.out.println("Starting Latch: " + latch.getCount());
+		System.out.println("Outer Loop: " + outerLoop);
 		
 		final ExecutorService executor = Executors.newFixedThreadPool(threadPool);
 
@@ -141,6 +143,7 @@ public class CompressedSequenceFile {
 							long stopTime = System.currentTimeMillis();
 							System.out.println(localHost + " - Written " + ((i+1)*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
 							startTime = System.currentTimeMillis();
+							System.out.println(latch.getCount());
 						}
 						
 					} catch (Exception e) {
