@@ -163,6 +163,7 @@ public class CompressedSequenceFile {
 		long start = System.currentTimeMillis();
 		for (int k = 0; k < loopCount; k++) {
 			final BufferedReader br = new BufferedReader(new FileReader(sourcePath));
+			System.out.println("K: " + k);
 			for (int i = 0; i < outerLoop; i++) {
 				StringBuffer buffer = new StringBuffer(bufferSize * 230);
 				for (int j = 0; j < bufferSize; j++) {
