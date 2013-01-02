@@ -160,7 +160,7 @@ public class CompressedSequenceFile {
 				StringBuffer buffer = new StringBuffer(bufferSize * 230);
 				for (int j = 0; j < bufferSize; j++) {
 					if (j%100 == 0){
-						Thread.sleep(random.nextInt(1), random.nextInt(1));
+						Thread.sleep(random.nextInt(1));
 					}
 					String line = br.readLine();
 					buffer.append(line);
