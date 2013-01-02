@@ -83,7 +83,7 @@ public class CompressedSequenceFile {
 			latch.await();
 			long stop = System.currentTimeMillis();
 			long totalRecords = sourceRecordCount * virtualWriters;
-			System.out.println("Done writing " + totalRecords + " with " + virtualWriters + " virtual writers in " + (stop-start) + " milliseconds");
+			//System.out.println("Done writing " + totalRecords + " with " + virtualWriters + " virtual writers in " + (stop-start) + " milliseconds");
 			executor.shutdownNow();
 			
 		}	
@@ -187,7 +187,7 @@ public class CompressedSequenceFile {
 		}
 		latch.await();
 		long stop = System.currentTimeMillis();
-		System.out.println("Compressed and written " + (sourceRecordCount*loopCount) + " records in " + (stop - start) + " milliseconds");
+		//System.out.println("Compressed and written " + (sourceRecordCount*loopCount) + " records in " + (stop - start) + " milliseconds");
 		writer.close();
 		executor.shutdownNow();
 	}
