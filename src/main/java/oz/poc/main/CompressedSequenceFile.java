@@ -137,7 +137,7 @@ public class CompressedSequenceFile {
 							throw new IllegalStateException("Timed out while retrieving data from queue");
 						}
 						writer.append(key, compressedBytes);
-						if (i%10000 == 0){
+						if (i > 0 && (i+1)%10000 == 0){
 							long stopTime = System.currentTimeMillis();
 							System.out.println(localHost + " - Written " + (i*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
 							startTime = System.currentTimeMillis();
@@ -187,7 +187,7 @@ public class CompressedSequenceFile {
 		
 		latch.await();
 		long stop = System.currentTimeMillis();
-		System.out.println("Compressed and written " + sourceRecordCount + " records in " + (stop - start) + " milliseconds");
+		System.out.println("Compressed and written " + (sourceRecordCount*loopCount) + " records in " + (stop - start) + " milliseconds");
 		writer.close();
 		executor.shutdownNow();
 	}
