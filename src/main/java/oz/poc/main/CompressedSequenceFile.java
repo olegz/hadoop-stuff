@@ -164,8 +164,9 @@ public class CompressedSequenceFile {
 		for (int k = 0; k < loopCount; k++) {
 			final BufferedReader br = new BufferedReader(new FileReader(sourcePath));
 			System.out.println("K: " + k);
-			for (int i = 0; i < sourceRecordCount; i++) {
-				System.out.println("Second loop: " + i);
+			int oLoop = sourceRecordCount/bufferSize;
+			for (int i = 0; i < oLoop; i++) {
+				//System.out.println("Second loop: " + i);
 				StringBuffer buffer = new StringBuffer(bufferSize * 230);
 				for (int j = 0; j < bufferSize; j++) {
 					if (j%100 == 0){
