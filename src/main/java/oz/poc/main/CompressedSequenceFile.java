@@ -132,7 +132,7 @@ public class CompressedSequenceFile {
 				long startTime = System.currentTimeMillis();
 				for (int i = 0; i < outerLoop; i++) {
 					try {
-						final ImmutableBytesWritable compressedBytes = recordQueue.poll(10000, TimeUnit.MILLISECONDS);
+						final ImmutableBytesWritable compressedBytes = recordQueue.poll(30000, TimeUnit.MILLISECONDS);
 						if (compressedBytes == null){
 							throw new IllegalStateException("Timed out while retrieving data from queue");
 						}
