@@ -108,8 +108,6 @@ public class CompressedSequenceFile {
 		Assert.isTrue(sourceRecordCount % bufferSize == 0); // make sure its divisible without the remainder
 		final int outerLoop = (sourceRecordCount*loopCount) / bufferSize;
 		final CountDownLatch latch = new CountDownLatch(outerLoop);
-		System.out.println("Starting Latch: " + latch.getCount());
-		System.out.println("Outer Loop: " + outerLoop);
 		
 		final ExecutorService executor = Executors.newFixedThreadPool(threadPool);
 
@@ -124,8 +122,7 @@ public class CompressedSequenceFile {
 		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, IntWritable.class, ImmutableBytesWritable.class, compType);
 		
 		final IntWritable key = new IntWritable();
-		
-		
+			
 		final ArrayBlockingQueue<ImmutableBytesWritable> recordQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(outerLoop);
 		executor.execute(new Runnable() {
 			
@@ -143,7 +140,6 @@ public class CompressedSequenceFile {
 							long stopTime = System.currentTimeMillis();
 							System.out.println(localHost + " - Written " + ((i+1)*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
 							startTime = System.currentTimeMillis();
-							System.out.println(latch.getCount());
 						}
 						
 					} catch (Exception e) {
@@ -164,7 +160,7 @@ public class CompressedSequenceFile {
 				StringBuffer buffer = new StringBuffer(bufferSize * 230);
 				for (int j = 0; j < bufferSize; j++) {
 					if (j%100 == 0){
-						Thread.sleep(random.nextInt(1), random.nextInt(2));
+						Thread.sleep(random.nextInt(1), random.nextInt(1));
 					}
 					String line = br.readLine();
 					buffer.append(line);
