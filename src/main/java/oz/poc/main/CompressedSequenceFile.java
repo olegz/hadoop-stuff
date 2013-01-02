@@ -139,7 +139,7 @@ public class CompressedSequenceFile {
 						writer.append(key, compressedBytes);
 						if (i > 0 && (i+1)%10000 == 0){
 							long stopTime = System.currentTimeMillis();
-							System.out.println(localHost + " - Written " + (i*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
+							System.out.println(localHost + " - Written " + ((i+1)*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
 							startTime = System.currentTimeMillis();
 						}
 						
