@@ -31,76 +31,62 @@ public class CompressedSequenceFile {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception{
-		Random random = new Random();
-		for (int i = 0; i < 1000000; i++) {
-			long start = System.currentTimeMillis();
-			if (i%100 == 0){
-				Thread.sleep(random.nextInt(1), random.nextInt(2));
-			}
-			if (i%140000 == 0){
-				long stop = System.currentTimeMillis();
-				System.out.println(stop + ": "  + i);
-				start = System.currentTimeMillis();
-			}
-			
-			
+		final InetAddress localHost = InetAddress.getLocalHost();
+		System.out.println(localHost.getHostAddress());
+		System.out.println("######## Starting task #########");
+		System.out.println("Arguments: " + Arrays.asList(args) + " " + args.length);
+		String arguments = Arrays.asList(args).get(0);
+		String[] argumentsParsed = StringUtils.delimitedListToStringArray(arguments, ",");
+		
+		String methodName = argumentsParsed[0];
+		
+		final CompressedSequenceFile testHarness = new CompressedSequenceFile();
+		if (methodName.equalsIgnoreCase("prepareFile")){
+			int value = Integer.parseInt(argumentsParsed[1]);
+			String path = argumentsParsed[2];
+			testHarness.prepareFile(value, path);
 		}
-//		final InetAddress localHost = InetAddress.getLocalHost();
-//		System.out.println(localHost.getHostAddress());
-//		System.out.println("######## Starting task #########");
-//		System.out.println("Arguments: " + Arrays.asList(args) + " " + args.length);
-//		String arguments = Arrays.asList(args).get(0);
-//		String[] argumentsParsed = StringUtils.delimitedListToStringArray(arguments, ",");
-//		
-//		String methodName = argumentsParsed[0];
-//		
-//		final CompressedSequenceFile testHarness = new CompressedSequenceFile();
-//		if (methodName.equalsIgnoreCase("prepareFile")){
-//			int value = Integer.parseInt(argumentsParsed[1]);
-//			String path = argumentsParsed[2];
-//			testHarness.prepareFile(value, path);
-//		}
-//		else if (methodName.equalsIgnoreCase("toHDFS")){
-//			final int virtualWriters = Integer.parseInt(argumentsParsed[1]);
-//			final int sourceRecordCount = Integer.parseInt(argumentsParsed[2]);
-//			final int bufferSize = Integer.parseInt(argumentsParsed[3]);
-//			final int blockSize = Integer.parseInt(argumentsParsed[4]);
-//			final String uri = argumentsParsed[5];
-//			final String user = argumentsParsed[6];
-//			final String pathToHdfsFile = argumentsParsed[7];
-//			final String sourcePath = argumentsParsed[8];
-//			final int threadPool = Integer.parseInt(argumentsParsed[9]);
-//			
-//			final boolean blockCompression = Boolean.getBoolean(argumentsParsed[10]);
-//			final int loopCount = Integer.parseInt(argumentsParsed[11]);
-//			Assert.isTrue(loopCount > 0);
-//			
-//			ExecutorService executor = Executors.newFixedThreadPool(virtualWriters);
-//			final CountDownLatch latch = new CountDownLatch(virtualWriters);
-//			long start = System.currentTimeMillis();
-//			for (int i = 0; i < virtualWriters; i++) {
-//				final int I = i;
-//				executor.execute(new Runnable() {
-//					
-//					@Override
-//					public void run() {
-//						try {
-//							testHarness.toHDFS(loopCount, sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile+"-" + localHost.getHostAddress() + "-" + I + ".seq", sourcePath, threadPool, blockCompression);
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						}
-//						latch.countDown();
-//					}
-//				});
-//			}
-//			
-//			latch.await();
-//			long stop = System.currentTimeMillis();
-//			long totalRecords = sourceRecordCount * virtualWriters;
-//			System.out.println("Done writing " + totalRecords + " with " + virtualWriters + " virtual writers in " + (stop-start) + " milliseconds");
-//			executor.shutdownNow();
-//			
-//		}	
+		else if (methodName.equalsIgnoreCase("toHDFS")){
+			final int virtualWriters = Integer.parseInt(argumentsParsed[1]);
+			final int sourceRecordCount = Integer.parseInt(argumentsParsed[2]);
+			final int bufferSize = Integer.parseInt(argumentsParsed[3]);
+			final int blockSize = Integer.parseInt(argumentsParsed[4]);
+			final String uri = argumentsParsed[5];
+			final String user = argumentsParsed[6];
+			final String pathToHdfsFile = argumentsParsed[7];
+			final String sourcePath = argumentsParsed[8];
+			final int threadPool = Integer.parseInt(argumentsParsed[9]);
+			
+			final boolean blockCompression = Boolean.getBoolean(argumentsParsed[10]);
+			final int loopCount = Integer.parseInt(argumentsParsed[11]);
+			Assert.isTrue(loopCount > 0);
+			
+			ExecutorService executor = Executors.newFixedThreadPool(virtualWriters);
+			final CountDownLatch latch = new CountDownLatch(virtualWriters);
+			long start = System.currentTimeMillis();
+			for (int i = 0; i < virtualWriters; i++) {
+				final int I = i;
+				executor.execute(new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							testHarness.toHDFS(loopCount, sourceRecordCount, bufferSize, blockSize, uri, user, pathToHdfsFile+"-" + localHost.getHostAddress() + "-" + I + ".seq", sourcePath, threadPool, blockCompression);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						latch.countDown();
+					}
+				});
+			}
+			
+			latch.await();
+			long stop = System.currentTimeMillis();
+			long totalRecords = sourceRecordCount * virtualWriters;
+			System.out.println("Done writing " + totalRecords + " with " + virtualWriters + " virtual writers in " + (stop-start) + " milliseconds");
+			executor.shutdownNow();
+			
+		}	
 	}
 	
 	public void prepareFile(int value, String path) throws Exception{
