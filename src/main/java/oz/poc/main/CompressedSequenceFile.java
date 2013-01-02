@@ -106,7 +106,7 @@ public class CompressedSequenceFile {
 		Random random = new Random();
 		final InetAddress localHost = InetAddress.getLocalHost();
 		Assert.isTrue(sourceRecordCount % bufferSize == 0); // make sure its divisible without the remainder
-		final int outerLoop = sourceRecordCount / bufferSize;
+		final int outerLoop = (sourceRecordCount*loopCount) / bufferSize;
 		final CountDownLatch latch = new CountDownLatch(outerLoop);
 		
 		final ExecutorService executor = Executors.newFixedThreadPool(threadPool);
