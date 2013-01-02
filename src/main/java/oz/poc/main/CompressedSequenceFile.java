@@ -149,12 +149,8 @@ public class CompressedSequenceFile {
 					} catch (Exception e) {
 						e.printStackTrace();
 					} 
-					long g = latch.getCount();
 					
 					latch.countDown();
-					if (g == 1){
-						System.out.println("Latch should be 0: " + latch.getCount());
-					}
 				}
 			}
 		});
@@ -163,10 +159,8 @@ public class CompressedSequenceFile {
 		long start = System.currentTimeMillis();
 		for (int k = 0; k < loopCount; k++) {
 			final BufferedReader br = new BufferedReader(new FileReader(sourcePath));
-			System.out.println("K: " + k);
 			int oLoop = sourceRecordCount/bufferSize;
 			for (int i = 0; i < oLoop; i++) {
-				//System.out.println("Second loop: " + i);
 				StringBuffer buffer = new StringBuffer(bufferSize * 230);
 				for (int j = 0; j < bufferSize; j++) {
 					if (j%100 == 0){
@@ -195,7 +189,6 @@ public class CompressedSequenceFile {
 			}
 			br.close();
 		}
-		System.out.println("Wating on latch");
 		latch.await();
 		long stop = System.currentTimeMillis();
 		System.out.println("Compressed and written " + (sourceRecordCount*loopCount) + " records in " + (stop - start) + " milliseconds");
