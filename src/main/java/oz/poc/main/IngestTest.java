@@ -122,7 +122,12 @@ public class IngestTest {
 						@Override
 						public void run() {
 							byte[] compressedBytes = compressBOS(bytesToCompress);
-							recordsToBeFlushedQueue.offer(new ImmutableBytesWritable(compressedBytes));
+							try {
+								recordsToBeFlushedQueue.offer(new ImmutableBytesWritable(compressedBytes), Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							
 						}
 					});
 					buffer = new StringBuffer(bufferSize * 230);
