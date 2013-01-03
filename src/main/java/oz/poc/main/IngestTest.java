@@ -149,8 +149,8 @@ public class IngestTest {
 	}
 	
 	private void delay() throws Exception {
-		int i = random.nextInt(100);
-		if (i%100 == 0){
+		int i = random.nextInt(200);
+		if (i%200 == 0){
 			Thread.sleep(random.nextInt(1));
 		}
 	}
