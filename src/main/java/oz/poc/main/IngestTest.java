@@ -11,8 +11,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
@@ -71,7 +73,7 @@ public class IngestTest {
 		
 		final LongWritable key = new LongWritable();
 		
-		final ArrayBlockingQueue<ImmutableBytesWritable> recordsToBeFlushedQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(100);
+		final LinkedBlockingQueue<ImmutableBytesWritable> recordsToBeFlushedQueue = new LinkedBlockingQueue<ImmutableBytesWritable>(100);
 		
 		writingExecutor.execute(new Runnable() {
 			
