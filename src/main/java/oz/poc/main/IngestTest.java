@@ -91,6 +91,7 @@ public class IngestTest {
 						}
 						i++;
 					}	
+					System.out.println("I: " + i);
 					writingExecutor.shutdownNow();
 				} catch (Exception e) {
 					//e.printStackTrace();
