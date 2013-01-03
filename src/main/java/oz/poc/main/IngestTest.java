@@ -81,7 +81,7 @@ public class IngestTest {
 					ImmutableBytesWritable compressedBytes;
 					int i = 0;
 					long startTime = System.currentTimeMillis();
-					while ((compressedBytes = recordsToBeFlushedQueue.poll(30000, TimeUnit.MILLISECONDS)) != null){
+					while ((compressedBytes = recordsToBeFlushedQueue.poll(10000, TimeUnit.MILLISECONDS)) != null){
 						writer.append(key, compressedBytes);
 						if (i > 0 && (i+1)%10000 == 0){
 							long stopTime = System.currentTimeMillis();
@@ -128,7 +128,6 @@ public class IngestTest {
 		}
 		
 		compressingExecutor.shutdownNow();
-		System.out.println("Sleeping: " + recordsToBeFlushedQueue.size());
 		while (recordsToBeFlushedQueue.size() > 0){
 			
 			Thread.sleep(1000);
