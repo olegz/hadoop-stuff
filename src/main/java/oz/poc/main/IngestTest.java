@@ -73,7 +73,7 @@ public class IngestTest {
 		
 		final LongWritable key = new LongWritable();
 		
-		final LinkedBlockingQueue<ImmutableBytesWritable> recordsToBeFlushedQueue = new LinkedBlockingQueue<ImmutableBytesWritable>(100);
+		final ArrayBlockingQueue<ImmutableBytesWritable> recordsToBeFlushedQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(100);
 		
 		writingExecutor.execute(new Runnable() {
 			
@@ -83,7 +83,7 @@ public class IngestTest {
 					ImmutableBytesWritable compressedBytes;
 					int i = 1;
 					long startTime = System.currentTimeMillis();
-					while ((compressedBytes = recordsToBeFlushedQueue.poll(60000, TimeUnit.MILLISECONDS)) != null){
+					while ((compressedBytes = recordsToBeFlushedQueue.poll(10000, TimeUnit.MILLISECONDS)) != null){
 						writer.append(key, compressedBytes);
 						if (i%1000 == 0){
 							long stopTime = System.currentTimeMillis();
@@ -136,11 +136,11 @@ public class IngestTest {
 			br.close();
 		}
 		
-		compressingExecutor.shutdownNow();
+		compressingExecutor.shutdown();
 		while (recordsToBeFlushedQueue.size() > 0){
 			Thread.sleep(1000);
 		}
-		writingExecutor.shutdownNow();
+		writingExecutor.shutdown();
 	}
 	
 	private byte[] compressBOS(byte[] inputData) {
