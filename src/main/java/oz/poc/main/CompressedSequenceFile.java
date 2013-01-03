@@ -123,7 +123,7 @@ public class CompressedSequenceFile {
 		
 		final IntWritable key = new IntWritable();
 			
-		final ArrayBlockingQueue<ImmutableBytesWritable> recordQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(outerLoop);
+		final ArrayBlockingQueue<ImmutableBytesWritable> recordQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(1000);
 		executor.execute(new Runnable() {
 			
 			@Override
