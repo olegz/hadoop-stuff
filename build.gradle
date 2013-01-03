@@ -32,10 +32,10 @@ task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts'
 }
 
-task seqCompressed(dependsOn: 'classes', type: JavaExec) {
+task ingest(dependsOn: 'classes', type: JavaExec) {
   description = 'Blah blah'
   args setup
-  main = 'oz.poc.main.CompressedSequenceFile'
+  main = 'oz.poc.main.IngestTest'
   classpath = sourceSets.main.runtimeClasspath
 }
 
