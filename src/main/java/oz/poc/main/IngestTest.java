@@ -157,7 +157,7 @@ public class IngestTest {
 	private void delay() throws Exception {
 		int i = random.nextInt(200);
 		if (i%200 == 0){
-			Thread.sleep(random.nextInt(2));
+			Thread.sleep(random.nextInt(1));
 		}
 	}
 }
