@@ -85,15 +85,13 @@ public class IngestTest {
 					long startTime = System.currentTimeMillis();
 					while ((compressedBytes = recordsToBeFlushedQueue.poll(10000, TimeUnit.MILLISECONDS)) != null){
 						writer.append(key, compressedBytes);
-						if (i%1000 == 0){
+						if (i%10000 == 0){
 							long stopTime = System.currentTimeMillis();
-							System.out.println(i);
 							System.out.println(localHost + " - Written " + (i*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
 							startTime = System.currentTimeMillis();
 						}
 						i++;
 					}	
-					System.out.println("I: " + i);
 				} catch (Exception e) {
 					//e.printStackTrace();
 				}			
