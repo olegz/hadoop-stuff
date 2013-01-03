@@ -130,7 +130,7 @@ public class IngestTest {
 		compressingExecutor.shutdownNow();
 		while (recordsToBeFlushedQueue.size() > 0){
 			
-			Thread.sleep(1000);
+			Thread.sleep(10000);
 		}
 		writingExecutor.shutdown();
 	}
