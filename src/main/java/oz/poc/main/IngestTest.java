@@ -55,7 +55,7 @@ public class IngestTest {
 		Calendar cal = Calendar.getInstance();
 		
 		ExecutorService compressingExecutor = Executors.newFixedThreadPool(threadPool);
-		ExecutorService writingExecutor = Executors.newSingleThreadExecutor();
+		final ExecutorService writingExecutor = Executors.newSingleThreadExecutor();
 		
 		final InetAddress localHost = InetAddress.getLocalHost();
 		Configuration configuration = new Configuration();
@@ -89,7 +89,8 @@ public class IngestTest {
 							startTime = System.currentTimeMillis();
 						}
 						i++;
-					}				
+					}	
+					writingExecutor.shutdownNow();
 				} catch (Exception e) {
 					//e.printStackTrace();
 				}			
@@ -128,11 +129,6 @@ public class IngestTest {
 		}
 		
 		compressingExecutor.shutdownNow();
-		while (recordsToBeFlushedQueue.size() > 0){
-			
-			Thread.sleep(10000);
-		}
-		writingExecutor.shutdown();
 	}
 	
 	private byte[] compressBOS(byte[] inputData) {
