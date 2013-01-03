@@ -85,6 +85,7 @@ public class IngestTest {
 						writer.append(key, compressedBytes);
 						if (i > 0 && (i+1)%1000 == 0){
 							long stopTime = System.currentTimeMillis();
+							System.out.println(i);
 							System.out.println(localHost + " - Written " + ((i+1)*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
 							startTime = System.currentTimeMillis();
 						}
