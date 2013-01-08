@@ -34,9 +34,16 @@ task wrapper(type: Wrapper) {
 }
 
 task ingest(dependsOn: 'classes', type: JavaExec) {
-  description = 'Blah blah'
+  description = 'Ingest'
   args setup
   main = 'oz.poc.main.IngestTest'
+  classpath = sourceSets.main.runtimeClasspath
+}
+
+task recordCount(dependsOn: 'classes', type: JavaExec) {
+  description = 'Record Count'
+  args setup
+  main = 'oz.poc.mapred.RecordCount'
   classpath = sourceSets.main.runtimeClasspath
 }
 
