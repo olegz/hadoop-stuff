@@ -49,7 +49,7 @@ public class IngestTest {
 		final String user = argumentsParsed[6];
 		final int threadPool = Integer.parseInt(argumentsParsed[7]);
 		final boolean blockCompression = Boolean.getBoolean(argumentsParsed[8]);
-		
+		   
 //		new IngestTest().toHDFS(1250, 10000, "536870912", "hdfs://192.168.47.10:54310", "/hduser/input/", "source/small-source.txt", "hduser", 4, false);
 		new IngestTest().toHDFS(iterations, bufferSize, blockSize, strUri, targetPath, sourcePath, user, threadPool, blockCompression);
 	}
