@@ -3,6 +3,7 @@ package oz.poc.mapred;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
@@ -23,6 +24,7 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.springframework.util.StringUtils;
 
 public class RecordCount {
 	
@@ -77,12 +79,17 @@ public class RecordCount {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String user = args[0];
-		final String inputPath = args[1];
-		final String outputPath = args[2];
-		final String nameNodeAddress = args[3];
-		final String jobTrackerAddressAddress = args[4];
-		final String splitSize = args[5];
+		System.out.println("######## Starting task #########");
+		System.out.println("Arguments: " + Arrays.asList(args) + " " + args.length);
+		String[] argumentsParsed = StringUtils.delimitedListToStringArray(args[0], ",");
+		
+		String user = argumentsParsed[0];
+		final String inputPath = argumentsParsed[1];
+		final String outputPath = argumentsParsed[2];
+		final String nameNodeAddress = argumentsParsed[3];
+		final String jobTrackerAddressAddress = argumentsParsed[4];
+		final String splitSize = argumentsParsed[5];
+		final String jar = argumentsParsed[6];
 		UserGroupInformation ugi = UserGroupInformation.createRemoteUser(user);
 		ugi.doAs(new PrivilegedAction<Object>() {
 
@@ -95,7 +102,7 @@ public class RecordCount {
 					conf.set("mapred.job.tracker", jobTrackerAddressAddress);
 					conf.set("mapred.max.split.size", splitSize);
 					//mapred.max.split.size=536870912
-					conf.setJar("file:build/libs/map-red-poc-1.3.jar");
+					conf.setJar("file:" + jar);
 					conf.setMapperClass(TokenizerMapper.class);
 					conf.setInputFormat(SequenceFileInputFormat.class);
 					conf.setCombinerClass(IntSumReducer.class);

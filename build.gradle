@@ -47,4 +47,11 @@ task recordCount(dependsOn: 'classes', type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
 }
 
+task grep(dependsOn: 'classes', type: JavaExec) {
+  description = 'Record Count'
+  args setup
+  main = 'oz.poc.mapred.DistributedGrep'
+  classpath = sourceSets.main.runtimeClasspath
+}
+
 
