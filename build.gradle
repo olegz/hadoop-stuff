@@ -26,17 +26,18 @@ dependencies {
    compile "org.slf4j:slf4j-log4j12:1.6.6" 
    
    testCompile "junit:junit:4.10"
+   testCompile "javax.ws.rs:jsr311-api:0.11"
 }
 
 task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts'
 }
 
-task ingest(dependsOn: 'classes', type: JavaExec) {
-  description = 'Blah blah'
-  args setup
-  main = 'oz.poc.main.IngestTest'
-  classpath = sourceSets.main.runtimeClasspath
-}
+//task ingest(dependsOn: 'classes', type: JavaExec) {
+//  description = 'Blah blah'
+//  args setup
+//  main = 'oz.poc.main.IngestTest'
+//  classpath = sourceSets.main.runtimeClasspath
+//}
 
 

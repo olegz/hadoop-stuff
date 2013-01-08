@@ -6,21 +6,23 @@ import java.io.FileReader;
 import java.net.InetAddress;
 import java.net.URI;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
@@ -48,11 +50,11 @@ public class IngestTest {
 		final int threadPool = Integer.parseInt(argumentsParsed[7]);
 		final boolean blockCompression = Boolean.getBoolean(argumentsParsed[8]);
 		
-		//new IngestTest().toHDFS(1250, 1000, "536870912", "hdfs://192.168.47.10:54310", "/hduser/output/", "source/small-source.txt", "hduser", 4, false);
+//		new IngestTest().toHDFS(1250, 10000, "536870912", "hdfs://192.168.47.10:54310", "/hduser/input/", "source/small-source.txt", "hduser", 4, false);
 		new IngestTest().toHDFS(iterations, bufferSize, blockSize, strUri, targetPath, sourcePath, user, threadPool, blockCompression);
 	}
 
-	public void toHDFS(int iterations, final int bufferSize, String hdfsBlockSize, String targetUri, String targetPath, String sourcePath, String user, int threadPool, boolean blockCompression) throws Exception {
+	public void toHDFS(final int iterations, final int bufferSize, String hdfsBlockSize, String targetUri, String targetPath, String sourcePath, String user, int threadPool, boolean blockCompression) throws Exception {
 		DateFormat dateFormat = new SimpleDateFormat("MM_dd_yyyy");
 		Calendar cal = Calendar.getInstance();
 		
@@ -63,29 +65,29 @@ public class IngestTest {
 		Configuration configuration = new Configuration();
 		configuration.set("dfs.block.size", hdfsBlockSize);// play around with this number (in bytes)
 		FileSystem fs = FileSystem.get(new URI(targetUri), configuration, user);
-		Path outFilePath = new Path(targetPath + "/" + dateFormat.format(cal.getTime()) + "/" + localHost.getHostAddress() + "/cdr.seq");
+		Path outFilePath = new Path(targetPath + "/" + dateFormat.format(cal.getTime()) + "/" + localHost.getHostAddress() + "/cdr2.seq");
 		SequenceFile.CompressionType compType = CompressionType.NONE;
 		if (blockCompression){
 			compType = CompressionType.BLOCK;
 		}
 		
-		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, LongWritable.class, ImmutableBytesWritable.class, compType);
+		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, outFilePath, LongWritable.class, BytesWritable.class, compType);
 		
 		final LongWritable key = new LongWritable();
 		
-		final ArrayBlockingQueue<ImmutableBytesWritable> recordsToBeFlushedQueue = new ArrayBlockingQueue<ImmutableBytesWritable>(100);
+		final ArrayBlockingQueue<BytesWritable> recordsToBeFlushedQueue = new ArrayBlockingQueue<BytesWritable>(100);
 		
 		writingExecutor.execute(new Runnable() {
 			
 			@Override
 			public void run() {
 				try {
-					ImmutableBytesWritable compressedBytes;
+					BytesWritable compressedBytes;
 					int i = 1;
 					long startTime = System.currentTimeMillis();
 					while ((compressedBytes = recordsToBeFlushedQueue.poll(10000, TimeUnit.MILLISECONDS)) != null){
 						writer.append(key, compressedBytes);
-						if (i%10000 == 0){
+						if (i%iterations == 0){
 							long stopTime = System.currentTimeMillis();
 							System.out.println(localHost + " - Written " + (i*bufferSize) + " records in " + (stopTime - startTime) + " milliseconds");
 							startTime = System.currentTimeMillis();
@@ -99,15 +101,29 @@ public class IngestTest {
 		});
 		
 		System.out.println("Starting");
-		
+		Random random = new Random();
+		String record = "<24> 2012-06-13T00:25:02 {CGN-SET2}[OLEG ZHURAKOUSKY]: ASP_SFW_DELETE_FLOW: proto 7 (TELNET) application: test6, ge-12/0/0.0:156.56.0.124:19972 -> 156.56.0.125:19973, deleting forward or watch flow 2 ; source address and port translate to 156.56.0.126:19974";
+		int recordCount = 0;
 		for (int i = 0; i < iterations; i++) {
 			final BufferedReader br = new BufferedReader(new FileReader(sourcePath));
 			StringBuffer buffer = new StringBuffer(bufferSize * 230);
 			int counter = 0;
 			
 			String line;
+			int cnt = 0;
 			while ((line = br.readLine()) != null) {
-				buffer.append(line);
+				int rInt = random.nextInt(10000001);
+				if (rInt > 0 && rInt % 10000000 == 0){
+					buffer.append(record + "\n");
+					NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+					DecimalFormat df = (DecimalFormat)nf;
+					df.applyPattern("###,###,###");
+					String output = df.format(cnt + recordCount);
+					System.out.println("Injected gost record - " + output);
+				}
+				else {
+					buffer.append(line + "\n");
+				}
 				counter++;
 				this.delay();
 				
@@ -120,7 +136,7 @@ public class IngestTest {
 						public void run() {
 							byte[] compressedBytes = compressBOS(bytesToCompress);
 							try {
-								recordsToBeFlushedQueue.offer(new ImmutableBytesWritable(compressedBytes), Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+								recordsToBeFlushedQueue.offer(new BytesWritable(compressedBytes), Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -129,9 +145,11 @@ public class IngestTest {
 					});
 					buffer = new StringBuffer(bufferSize * 230);
 				}
+				cnt++;
 			}
 			
 			br.close();
+			recordCount += 80000;
 		}
 		
 		compressingExecutor.shutdown();
