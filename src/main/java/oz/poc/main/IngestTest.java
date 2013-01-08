@@ -65,7 +65,7 @@ public class IngestTest {
 		Configuration configuration = new Configuration();
 		configuration.set("dfs.block.size", hdfsBlockSize);// play around with this number (in bytes)
 		FileSystem fs = FileSystem.get(new URI(targetUri), configuration, user);
-		Path outFilePath = new Path(targetPath + "/" + dateFormat.format(cal.getTime()) + "/" + localHost.getHostAddress() + "/cdr2.seq");
+		Path outFilePath = new Path(targetPath + "/" + dateFormat.format(cal.getTime()) + "/" + localHost.getHostAddress() + "/cdr.seq");
 		SequenceFile.CompressionType compType = CompressionType.NONE;
 		if (blockCompression){
 			compType = CompressionType.BLOCK;
@@ -95,7 +95,7 @@ public class IngestTest {
 						i++;
 					}	
 				} catch (Exception e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 				}			
 			}
 		});
