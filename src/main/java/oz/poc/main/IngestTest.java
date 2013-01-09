@@ -36,22 +36,22 @@ public class IngestTest {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("######## Starting task #########");
-		System.out.println("Arguments: " + Arrays.asList(args) + " " + args.length);
-		String[] argumentsParsed = StringUtils.delimitedListToStringArray(args[0], ",");
-		
-		final int iterations = Integer.parseInt(argumentsParsed[0]);
-		final int bufferSize = Integer.parseInt(argumentsParsed[1]);
-		final String blockSize = argumentsParsed[2];
-		final String strUri = argumentsParsed[3];
-		final String targetPath = argumentsParsed[4];
-		final String sourcePath = argumentsParsed[5];
-		final String user = argumentsParsed[6];
-		final int threadPool = Integer.parseInt(argumentsParsed[7]);
-		final boolean blockCompression = Boolean.getBoolean(argumentsParsed[8]);
+//		System.out.println("######## Starting task #########");
+//		System.out.println("Arguments: " + Arrays.asList(args) + " " + args.length);
+//		String[] argumentsParsed = StringUtils.delimitedListToStringArray(args[0], ",");
+//		
+//		final int iterations = Integer.parseInt(argumentsParsed[0]);
+//		final int bufferSize = Integer.parseInt(argumentsParsed[1]);
+//		final String blockSize = argumentsParsed[2];
+//		final String strUri = argumentsParsed[3];
+//		final String targetPath = argumentsParsed[4];
+//		final String sourcePath = argumentsParsed[5];
+//		final String user = argumentsParsed[6];
+//		final int threadPool = Integer.parseInt(argumentsParsed[7]);
+//		final boolean blockCompression = Boolean.getBoolean(argumentsParsed[8]);
 		   
-//		new IngestTest().toHDFS(1250, 10000, "536870912", "hdfs://192.168.47.10:54310", "/hduser/input/", "source/small-source.txt", "hduser", 4, false);
-		new IngestTest().toHDFS(iterations, bufferSize, blockSize, strUri, targetPath, sourcePath, user, threadPool, blockCompression);
+		new IngestTest().toHDFS((1250*6), 10000, "536870912", "hdfs://192.168.47.10:54310", "/hduser/input/", "source/small-source.txt", "hduser", 4, false);
+//		new IngestTest().toHDFS(iterations, bufferSize, blockSize, strUri, targetPath, sourcePath, user, threadPool, blockCompression);
 	}
 
 	public void toHDFS(final int iterations, final int bufferSize, String hdfsBlockSize, String targetUri, String targetPath, String sourcePath, String user, int threadPool, boolean blockCompression) throws Exception {
@@ -125,7 +125,7 @@ public class IngestTest {
 					buffer.append(line + "\n");
 				}
 				counter++;
-				this.delay();
+				//this.delay();
 				
 				if (counter == bufferSize){
 					counter = 0;

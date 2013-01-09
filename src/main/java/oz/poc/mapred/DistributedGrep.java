@@ -104,6 +104,7 @@ public class DistributedGrep {
 					conf.set("mapred.max.split.size", splitSize);
 					conf.set("mapred.reduce.tasks", "0");
 					conf.set("mapred.reduce.tasks", "0");
+					//mapred.tasktracker.map.tasks.maximum
 					conf.set("mapred.tasktracker.map.tasks.maximum", "128");
 					conf.set("mapred.map.tasks", "64");
 					conf.set("mapred.job.reuse.jvm.num.tasks", "2");

@@ -3,17 +3,12 @@ package oz.poc.file;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.RandomAccessFile;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.integration.MessageChannel;
