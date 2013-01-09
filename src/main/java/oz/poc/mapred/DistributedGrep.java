@@ -106,6 +106,8 @@ public class DistributedGrep {
 					conf.set("mapred.reduce.tasks", "0");
 					conf.set("mapred.tasktracker.map.tasks.maximum", "128");
 					conf.set("mapred.map.tasks", "64");
+					conf.set("mapred.job.reuse.jvm.num.tasks", "2");
+					
 					conf.setJar("file:" + jar);
 					conf.setMapperClass(TokenizerMapper.class);
 					conf.setInputFormat(SequenceFileInputFormat.class);
