@@ -21,6 +21,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.hadoop.cli.util.CLITestData.TestCmd.CommandType;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -30,6 +31,9 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.SequenceFileAsBinaryInputFormat.SequenceFileAsBinaryRecordReader;
+import org.apache.hadoop.mapred.SequenceFileRecordReader;
 import org.junit.Test;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -37,6 +41,36 @@ import org.springframework.util.ReflectionUtils;
 public class TailFTest {
 	
 	
+	@Test
+	public void testWriteSequenceFile() throws Exception {
+		Configuration configuration = new Configuration();
+		FileSystem fs = FileSystem.get(new URI("hdfs://192.168.47.10:54310"), configuration, "hduser");
+		Path inFilePath = new Path("/hduser/input/foo.seq");
+		
+		final SequenceFile.Writer writer = SequenceFile.createWriter(fs, configuration, inFilePath, LongWritable.class, Text.class, CompressionType.NONE);
+		
+		writer.append(new LongWritable(1), "Hello 1");
+		writer.append(new LongWritable(2), "Hello 2");
+		writer.append(new LongWritable(3), "Hello 3");
+		
+		writer.close();
+		
+		SequenceFile.Reader reader = null;
+//		try {
+//			reader = new SequenceFile.Reader(fs, inFilePath, configuration);
+//			
+//			
+//			while (reader.next(key, value)) {
+//				byte[] bytes = value.getBytes();
+//				System.out.println(key);
+//				System.out.println(bytes.length);
+//				//System.out.println(this.decompressBOS(bytes));
+//			}
+//		} 
+//		finally {
+//			IOUtils.closeStream(reader); 
+//		}
+	}
 	
 	
 	@Test
